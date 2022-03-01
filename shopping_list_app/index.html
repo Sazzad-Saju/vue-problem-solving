@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <title>Shopping List App</title>
+</head>
+
+<body>
+    <div id="shopping-list">
+        <div class="header">
+            <h1>{{header}}</h1>
+            <button v-if="editing" @click="toggleButton(false)" class="btn btn-cancel">Cancel</button>
+            <button v-else @click="toggleButton(true)" class="btn btn-primary">Add Item</button>
+        </div>
+
+        <div class="add-item-form" v-if="editing">
+            <input @keyup.enter="saveItem" v-model="newItem" type="text" placeholder="Add an Item">
+            <p class="counter" :class="{danger: characterCount>20}">{{characterCount}}/20</p>
+            <!-- <label><input type="radio" value="low" v-model="itemPriority">Low</label>
+        <label><input type="radio" value="high" v-model="itemPriority">High</label> -->
+            <!-- <label> Priority: 
+            <select v-model="itemPriority">
+                <option value="low">Low</option>
+                <option value="high">High</option>
+            </select>
+        </label> -->
+            <label>
+            <input type="checkbox" value="high" v-model="priorityHigh"> High
+        </label>
+            <button class="btn btn-primary" @click="saveItem" :disabled="newItem.length==0 || characterCount>20">
+                Save Item
+            </button>
+        </div>
+        <!-- <br> {{newItem}} {{priorityHigh}} -->
+        <ul>
+            <li @click="togglePurchased(item)" v-for="item in reversedItem" :key="item.id" :class="{strikeout: item.purchased, priority: item.priorityHigh}">{{item.label}} </li>
+        </ul>
+    </div>
+    <script src="https://unpkg.com/vue@3"></script>
+</body>
+<script>
+    const shoppingList = Vue.createApp({
+        computed: {
+            characterCount() {
+                return this.newItem.length
+            },
+            reversedItem() {
+                return [...this.items].reverse()
+            }
+        },
+        data() {
+            return {
+                header: 'Shopping List App',
+                newItem: '',
+                // itemPriority: 'low',
+                priorityHigh: false,
+                editing: false,
+                //items object
+                items: [{
+                    id: 1,
+                    label: "10 Days of Vue",
+                    purchased: false,
+                    priorityHigh: false,
+                }, {
+                    id: 2,
+                    label: "no time to die",
+                    purchased: true,
+                    priorityHigh: false,
+                }, {
+                    id: 3,
+                    label: "forever",
+                    purchased: false,
+                    priorityHigh: true,
+                }, ],
+            }
+        },
+        methods: {
+            saveItem() {
+                // if (!this.characterCount > 20) {
+                this.items.push({
+                    id: this.items.length + 1,
+                    label: this.newItem,
+                    priorityHigh: this.priorityHigh
+                })
+                this.newItem = "";
+                this.priorityHigh = "";
+                console.log(this.newItem);
+                // }
+            },
+            toggleButton(editing) {
+                this.editing = editing
+                this.newItem = ""
+                this.priorityHigh = ""
+            },
+            togglePurchased(item) {
+                item.purchased = !item.purchased
+            }
+        }
+    }).mount('#shopping-list')
+</script>
+
+</html>
